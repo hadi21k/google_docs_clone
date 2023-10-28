@@ -91,9 +91,11 @@ const updateDocumentById = async (req, res, next) => {
     }
 
     if (
-      document.public_access !== "Anyone with the link can edit" ||
+      document.public_access !== "Anyone with the link can edit" &&
       !document.collaborators.some(
-        (c) => c.user.toString() === req.user._id.toString()
+        (c) =>
+          c.user.toString() === req.user._id.toString() &&
+          c.permission !== "owner"
       )
     ) {
       const error = new Error("You are not authorized to edit this document");

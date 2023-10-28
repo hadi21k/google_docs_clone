@@ -14,7 +14,7 @@ const getDoc = async (id, origin) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return null;
   }
 };

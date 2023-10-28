@@ -44,11 +44,11 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET || "secret",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
       maxAge: 1000 * 60 * 60 * 24,
       sameSite: "lax",
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
     },
     store: sessionStore,

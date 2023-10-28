@@ -27,7 +27,7 @@ const register = async (req, res, next) => {
         return next(err);
       }
 
-      res.status(201).json("User created successfully and logged in");
+      return res.redirect(process.env.CLIENT_URL);
     });
   } catch (err) {
     next(err);
@@ -51,7 +51,7 @@ const login = (req, res, next) => {
         logger.error(err);
         return next(err);
       }
-      return res.status(200).json("Logged in successfully");
+      return res.redirect(process.env.CLIENT_URL);
     });
   })(req, res, next);
 };

@@ -1,63 +1,34 @@
 const Document = require("../models/document.model");
 
 const findOneDocument = async (query) => {
-  try {
-    const document = await Document.findOne(query);
-
-    return document;
-  } catch (error) {
-    throw error;
-  }
+  return await Document.findOne(query);
 };
 
-const findOneDocumentById = async (id) => {
-  try {
-    const document = await Document.findById(id, "-__v").populate(
-      "collaborators.user",
-      "username permission"
-    );
+const findById = async (id) => {
+  return await Document.findById(id);
+};
 
-    if (!document) {
-      const error = new Error("Document not found");
-      error.statusCode = 404;
-      throw error;
-    }
-
-    return document;
-  } catch (error) {
-    throw error;
-  }
+const findDocumentByIdAndPopulate = async (id) => {
+  return await Document.findById(id, "-__v").populate(
+    "collaborators.user",
+    "username permission"
+  );
 };
 
 const createOneDocument = async (document) => {
-  try {
-    const newDocument = await Document.create(document);
-
-    if (!newDocument) {
-      const error = new Error("Document could not be created");
-      error.statusCode = 500;
-      throw error;
-    }
-
-    return newDocument;
-  } catch (error) {
-    throw error;
-  }
+  await Document.create(document);
 };
 
-const deleteOneDocument = async (query) => {
-  try {
-    const document = await Document.findOneAndDelete(query);
-
-    return document;
-  } catch (error) {
-    throw error;
-  }
+const findDocs = async (query) => {
+  return Document.find(query, "-__v")
+    .populate("collaborators.user", "username")
+    .sort({ updated: -1 });
 };
 
 module.exports = {
   findOneDocument,
   createOneDocument,
-  findOneDocumentById,
-  deleteOneDocument,
+  findDocumentByIdAndPopulate,
+  findById,
+  findDocs,
 };

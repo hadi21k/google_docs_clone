@@ -1,18 +1,16 @@
-const Document = require("../models/document.model");
 const {
   findOneDocument,
   createOneDocument,
-  findOneDocumentById,
-  deleteOneDocument,
+  findDocumentByIdAndPopulate,
+  findById,
+  findDocs,
 } = require("../services/document.services");
 
 const getAllDocuments = async (req, res, next) => {
   const { _id } = req.user;
 
   try {
-    const documents = await Document.find({ "collaborators.user": _id }, "-__v")
-      .populate("collaborators.user", "username")
-      .sort({ updated: -1 });
+    const documents = await findDocs({ "collaborators.user": _id });
 
     if (!documents) {
       const error = new Error("No documents found");
@@ -71,7 +69,7 @@ const getDocumentById = async (req, res, next) => {
   }
 
   try {
-    const document = await findOneDocumentById(id);
+    const document = await findDocumentByIdAndPopulate(id);
 
     return res.status(200).json(document);
   } catch (error) {
@@ -82,24 +80,24 @@ const getDocumentById = async (req, res, next) => {
 const updateDocumentById = async (req, res, next) => {
   const { id } = req.params;
   const { title, content } = req.body;
-  console.log(title);
 
   try {
-    const document = await findOneDocument({
-      _id: id,
-      $or: [
-        { public_access: "Anyone with the link can edit" },
-        {
-          collaborators: {
-            $elemMatch: { user: req.user._id },
-          },
-        },
-      ],
-    });
+    const document = await findById(id);
 
     if (!document) {
-      const error = new Error("Document not found or user not authorized");
+      const error = new Error("Document not found");
       error.statusCode = 404;
+      throw error;
+    }
+
+    if (
+      document.public_access !== "Anyone with the link can edit" ||
+      !document.collaborators.some(
+        (c) => c.user.toString() === req.user._id.toString()
+      )
+    ) {
+      const error = new Error("You are not authorized to edit this document");
+      error.statusCode = 403;
       throw error;
     }
 
@@ -125,19 +123,23 @@ const deleteDocumentById = async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    const document = await deleteOneDocument({
-      _id: id,
-      collaborators: {
-        $elemMatch: {
-          user: req.user._id,
-          permission: "owner",
-        },
-      },
-    });
+    const document = await findById(id);
 
     if (!document) {
-      const error = new Error("Document not found or user not authorized");
+      const error = new Error("Document not found");
       error.statusCode = 404;
+      throw error;
+    }
+
+    if (
+      !document.collaborators.some(
+        (c) =>
+          c.permission === "owner" &&
+          c.user.toString() === req.user._id.toString()
+      )
+    ) {
+      const error = new Error("You are not authorized to delete this document");
+      error.statusCode = 403;
       throw error;
     }
 
@@ -152,19 +154,25 @@ const editAccess = async (req, res, next) => {
   const { access_type } = req.body;
 
   try {
-    const document = await Document.findOne({
-      _id: id,
-      collaborators: {
-        $elemMatch: {
-          user: req.user._id,
-          permission: "owner",
-        },
-      },
-    });
+    const document = await findById(id);
 
     if (!document) {
-      const error = new Error("Document not found or user not authorized");
+      const error = new Error("Document not found");
       error.statusCode = 404;
+      throw error;
+    }
+
+    if (
+      !document.collaborators.some(
+        (c) =>
+          c.permission === "owner" &&
+          c.user.toString() === req.user._id.toString()
+      )
+    ) {
+      const error = new Error(
+        "You are not authorized to edit access for this document"
+      );
+      error.statusCode = 403;
       throw error;
     }
 

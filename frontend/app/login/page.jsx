@@ -65,7 +65,7 @@ export default function page() {
               </button>
             </div>
             <div className="text-white text-sm">
-              <span>Don't have an account?</span>
+              <span>Don&apos;t have an account?</span>
               <Link
                 href="/register"
                 className="text-white ml-0.5 text-sm underline"

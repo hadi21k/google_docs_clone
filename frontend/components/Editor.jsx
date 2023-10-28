@@ -42,7 +42,7 @@ const Editor = ({ doc, user }) => {
 
       socket.emit("room:leave", doc._id, user.username);
     };
-  }, []);
+  }, [doc._id, toast, user.username]);
 
   const onChange = (content, delta, source, editor) => {
     if (source === "user") {
@@ -54,9 +54,11 @@ const Editor = ({ doc, user }) => {
   return (
     <>
       {doc.public_access === "Anyone with the link can edit" ||
-        doc.collaborators.filter(
-          (collaborator) => collaborator.user._id === user._id
-        )[0]?.permission === "owner" ? <Header content={value} doc={doc} socket={socket} /> : null}
+      doc.collaborators.filter(
+        (collaborator) => collaborator.user._id === user._id
+      )[0]?.permission === "owner" ? (
+        <Header content={value} doc={doc} socket={socket} />
+      ) : null}
       <div className="container mx-auto">
         <QuillNoSSRWrapper
           className="ql-editor min-h-[calc(100vh-160px)]"

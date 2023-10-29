@@ -11,10 +11,9 @@ export default async function Home() {
   const user = await userData;
   const docs = await docsData;
   if (!user) redirect("/login");
-  console.log(user, JSON.stringify(docs, null, 2));
   return (
     <div className="bg-primary min-h-screen text-white">
-      <Navbar user={user} />
+      <Navbar user={user} /> 
       <Docs user={user} docs={docs} />
     </div>
   );

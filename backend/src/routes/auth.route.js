@@ -11,4 +11,6 @@ router.post("/register", validateRegister, register);
 router.post("/login", validateLogin, login);
 router.get("/logout", logout);
 
+
+
 module.exports = router;

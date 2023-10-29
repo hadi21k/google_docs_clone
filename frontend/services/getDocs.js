@@ -6,7 +6,9 @@ const getDocs = async () => {
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/documents`,
       {
         method: "GET",
-        headers: { Cookie: cookies().toString() },
+        headers: {
+          Authorization: `Bearer ${cookies().getAll()[0].value}`,
+        },
         cache: "no-cache",
       }
     );

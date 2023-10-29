@@ -1,3 +1,4 @@
+const { decode } = require("jsonwebtoken");
 const { registerSchema, loginSchema } = require("../schemas/auth.schema");
 
 const validateRegister = async (req, res, next) => {
@@ -28,14 +29,22 @@ const validateLogin = async (req, res, next) => {
   }
 };
 
-const authenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
+const authenticated = async (req, res, next) => {
+  const authHeader = req.headers["authorization"];
 
-  const error = new Error("User not authenticated");
-  error.status = 401;
-  return next(error);
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+
+    const validateToken = await decode(token, process.env.JWT_SECRET);
+    if (validateToken) {
+      req.user = validateToken.id;
+      return next();
+    }
+
+    const error = new Error("User not authenticated");
+    error.status = 401;
+    return next(error);
+  }
 };
 
 module.exports = {

@@ -13,6 +13,7 @@ import { Button } from "./ui/button";
 import { Link2Icon } from "@radix-ui/react-icons";
 import { useToast } from "./ui/use-toast";
 import { useRouter } from "next/navigation";
+import { changeAccess } from "@/services/actions/changeAccess";
 
 const Share = ({ doc }) => {
   const { toast } = useToast();
@@ -21,25 +22,8 @@ const Share = ({ doc }) => {
   const [linkCopied, setLinkCopied] = useState(false);
 
   const changeAccessType = async (e) => {
-    console.log(e);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/documents/${doc._id}/access`,
-        {
-          method: "PATCH",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            access_type: e,
-          }),
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error.message);
-      }
+      const data = await changeAccess(doc._id, e);
       toast({
         description: data,
       });

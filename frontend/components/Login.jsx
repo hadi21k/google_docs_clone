@@ -1,6 +1,7 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { login, loginAction } from "@/services/actions/login";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -13,21 +14,7 @@ const Login = () => {
     const username = e.target.username.value;
     const password = e.target.password.value;
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password }),
-          credentials: "include",
-        }
-      );
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error.message);
-      }
-
+      await loginAction(username, password);
       toast({
         description: "Login success",
       });

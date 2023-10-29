@@ -9,6 +9,8 @@ import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
 import { useToast } from "./ui/use-toast";
 import { useRouter } from "next/navigation";
 import { timeSinceLastUpdate } from "@/lib/time";
+import { renameDoc } from "@/services/actions/renameDoc";
+import { deleteDoc } from "@/services/actions/deleteDoc";
 
 const Doc = ({ doc, username }) => {
   const [handleEdit, setHandleEdit] = useState(false);
@@ -18,23 +20,9 @@ const Doc = ({ doc, username }) => {
 
   const renameDocument = async () => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/documents/${doc._id}`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title,
-          }),
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error.message);
-      }
+      console.log(doc._id)
+      const data = await renameDoc(doc._id, title);
+
       toast({
         description: data,
       });
@@ -50,17 +38,7 @@ const Doc = ({ doc, username }) => {
 
   const deleteDocument = async () => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/documents/${doc._id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error.message);
-      }
+      const data = await deleteDoc(doc._id);
       toast({
         description: data,
       });

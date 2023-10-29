@@ -3,37 +3,22 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
 const logger = require("./config/logger");
 const connectDB = require("./config/connectMongo");
-const passport = require("passport");
-const {
-  createStrategy,
-  serializeUser,
-  deserializeUser,
-} = require("./config/passport");
+const cookieParser = require("cookie-parser");
 const { authenticated } = require("./middlewares/auth.middlware");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-const options = {
-  allowedHeaders: [
-    "Origin",
-    "X-Requested-With",
-    "Content-Type",
-    "Accept",
-    "X-Access-Token",
-  ],
-  credentials: true,
-  methods: "GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE",
-  origin: process.env.CLIENT_URL,
-  preflightContinue: true,
-};
-app.use(cors(options));
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -45,33 +30,7 @@ const io = new Server(server, {
 const { joinRoom, leaveRoom, sendChanges } =
   require("./subscriptions/document.listener")(io);
 
-const sessionStore = MongoStore.create({
-  mongoUrl: process.env.MONGO_URI,
-});
-
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24,
-      sameSite: "none",
-      secure: true,
-      // httpOnly: true,
-    },
-    store: sessionStore,
-  })
-);
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-passport.use(createStrategy);
-passport.serializeUser(serializeUser);
-passport.deserializeUser(deserializeUser);
-
-app.use("/api/auth", require("./routes/auth.route"));
+app.use("/v2/api/auth", require("./routes/v2/auth.route"));
 app.use("/api/users", require("./routes/user.route"));
 app.use("/api/documents", authenticated, require("./routes/document.route"));
 

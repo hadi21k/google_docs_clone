@@ -6,7 +6,9 @@ const getUser = async () => {
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/user`,
       {
         method: "GET",
-        headers: { Cookie: cookies().toString() },
+        headers: {
+          Authorization: `Bearer ${cookies().getAll()[0]?.value}`,
+        },
       }
     );
     if (!response.ok) throw new Error(response.statusText);

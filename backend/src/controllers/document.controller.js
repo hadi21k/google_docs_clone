@@ -7,10 +7,10 @@ const {
 } = require("../services/document.services");
 
 const getAllDocuments = async (req, res, next) => {
-  const { _id } = req.user;
+  const id = req.user;
 
   try {
-    const documents = await findDocs({ "collaborators.user": _id });
+    const documents = await findDocs({ "collaborators.user": id });
 
     if (!documents) {
       const error = new Error("No documents found");
@@ -32,7 +32,7 @@ const createDocument = async (req, res, next) => {
       title,
       collaborators: {
         $elemMatch: {
-          user: req.user._id,
+          user: req.user,
         },
       },
     });
@@ -47,7 +47,7 @@ const createDocument = async (req, res, next) => {
       title,
       collaborators: [
         {
-          user: req.user._id,
+          user: req.user,
           permission: "owner",
         },
       ],
@@ -91,12 +91,10 @@ const updateDocumentById = async (req, res, next) => {
     }
 
     if (
-      document.public_access !== "Anyone with the link can edit" &&
-      !document.collaborators.some(
-        (c) =>
-          c.user.toString() === req.user._id.toString() &&
-          c.permission !== "owner"
-      )
+      !(document.public_access === "Anyone with the link can edit" || 
+      document.collaborators.some(
+        (c) => c.user.toString() === req.user && c.permission === "owner"
+      ))
     ) {
       const error = new Error("You are not authorized to edit this document");
       error.statusCode = 403;
@@ -108,7 +106,7 @@ const updateDocumentById = async (req, res, next) => {
     if (content) {
       document.content = content;
       document.collaborators.push({
-        user: req.user._id,
+        user: req.user,
         permission: "editor",
       });
     }
@@ -136,14 +134,15 @@ const deleteDocumentById = async (req, res, next) => {
     if (
       !document.collaborators.some(
         (c) =>
-          c.permission === "owner" &&
-          c.user.toString() === req.user._id.toString()
+          c.permission === "owner" && c.user.toString() === req.user.toString()
       )
     ) {
       const error = new Error("You are not authorized to delete this document");
       error.statusCode = 403;
       throw error;
     }
+
+    await document.deleteOne();
 
     return res.status(200).json("Document deleted");
   } catch (error) {
@@ -167,8 +166,7 @@ const editAccess = async (req, res, next) => {
     if (
       !document.collaborators.some(
         (c) =>
-          c.permission === "owner" &&
-          c.user.toString() === req.user._id.toString()
+          c.permission === "owner" && c.user.toString() === req.user.toString()
       )
     ) {
       const error = new Error(

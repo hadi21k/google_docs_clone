@@ -5,6 +5,7 @@ const error = (err, req, res, next) => {
     error: {
       message: err.message,
       status,
+      stack: process.env.NODE_ENV === "production" ? "🥞" : err.stack,
     },
   });
 };

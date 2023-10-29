@@ -2,21 +2,13 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { logoutAction } from "@/services/actions/logout";
 
 const Navbar = ({ user }) => {
   const router = useRouter();
   const logout = async () => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/logout`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-      if (!res.ok) {
-        throw new Error(res.statusText);
-      }
+      logoutAction()
       router.push("/login");
     } catch (error) {
       console.log(error);

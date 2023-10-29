@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useToast } from "./ui/use-toast";
 import { useRouter } from "next/navigation";
+import { createDoc } from "@/services/actions/createDoc";
 
 const CreateDocument = () => {
   const [open, setOpen] = useState(false);
@@ -21,23 +22,7 @@ const CreateDocument = () => {
   const submit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/documents`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title: e.target[0].value,
-          }),
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error.message);
-      }
+      const data = await createDoc(title);
       toast({
         description: data,
       });

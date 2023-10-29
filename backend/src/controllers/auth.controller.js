@@ -51,7 +51,6 @@ const login = (req, res, next) => {
         logger.error(err);
         return next(err);
       }
-      // return res.redirect(process.env.CLIENT_URL);
       return res.json("Logged in successfully")
     });
   })(req, res, next);

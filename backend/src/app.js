@@ -17,12 +17,21 @@ const { authenticated } = require("./middlewares/auth.middlware");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true,
-  })
-);
+
+const options = {
+  allowedHeaders: [
+    "Origin",
+    "X-Requested-With",
+    "Content-Type",
+    "Accept",
+    "X-Access-Token",
+  ],
+  credentials: true,
+  methods: "GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE",
+  origin: process.env.CLIENT_URL,
+  preflightContinue: true,
+};
+app.use(cors(options));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

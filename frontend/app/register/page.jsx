@@ -1,8 +1,43 @@
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
-import React from "react";
+import { useRouter } from "next/navigation";
 
 const page = () => {
+  const { toast } = useToast();
+  const router = useRouter();
+  const register = async (e) => {
+    e.preventDefault();
+
+    const username = e.target.username.value;
+    const password = e.target.password.value;
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error.message);
+      }
+
+      toast({
+        description: "register success",
+      });
+      router.push("/");
+    } catch (err) {
+      toast({
+        description: err.message,
+        status: "error",
+      });
+    }
+  };
   return (
     <>
       <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-primary">
@@ -13,11 +48,7 @@ const page = () => {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form
-            className="space-y-6"
-            action={`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`}
-            method="POST"
-          >
+          <form className="space-y-6" onSubmit={register}>
             <div>
               <label
                 htmlFor="username"
@@ -84,10 +115,10 @@ const page = () => {
             <div className="text-white text-sm">
               <span>Already have an account?</span>
               <Link
-                href="/login"
+                href="/register"
                 className="text-white ml-0.5 text-sm underline"
               >
-                Login
+                register
               </Link>
             </div>
           </form>

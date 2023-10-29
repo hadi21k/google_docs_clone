@@ -1,8 +1,45 @@
 "use client";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function page() {
+  const { toast } = useToast();
+  const router = useRouter();
+  const login = async (e) => {
+    e.preventDefault();
+
+    const username = e.target.username.value;
+    const password = e.target.password.value;
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error.message);
+      }
+
+      toast({
+        description: "Login success",
+      });
+      router.push("/");
+    } catch (err) {
+      toast({
+        description: err.message,
+        status: "error",
+      });
+    }
+  };
+
   return (
     <>
       <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-primary">
@@ -13,11 +50,7 @@ export default function page() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form
-            className="space-y-6"
-            action={`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`}
-            method="POST"
-          >
+          <form className="space-y-6" onSubmit={login}>
             <div>
               <label
                 htmlFor="username"

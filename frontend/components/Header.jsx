@@ -5,15 +5,23 @@ import { Button } from "./ui/button";
 import { BookmarkIcon } from "@radix-ui/react-icons";
 import { useToast } from "./ui/use-toast";
 import { saveDoc } from "@/services/actions/saveDoc";
+import { useRouter } from "next/navigation";
 
 const Header = ({ content, doc, socket }) => {
   const { toast } = useToast();
+  const router = useRouter();
   const save = async () => {
     try {
       const data = await saveDoc(doc._id, content);
+
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
+
       toast({
         description: data,
       });
+      router.refresh();
       socket.emit("changes:send", doc._id, content);
     } catch (error) {
       toast({

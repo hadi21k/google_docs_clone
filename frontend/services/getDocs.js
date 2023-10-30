@@ -12,8 +12,8 @@ const getDocs = async () => {
         cache: "no-cache",
       }
     );
-    if (!response.ok) throw new Error(response.statusText);
     const data = await response.json();
+    if (!response.ok) throw new Error(data.error.message);
     return data;
   } catch (error) {
     console.log(error);

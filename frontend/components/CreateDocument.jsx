@@ -23,6 +23,11 @@ const CreateDocument = () => {
     e.preventDefault();
     try {
       const data = await createDoc(title);
+
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
+
       toast({
         description: data,
       });

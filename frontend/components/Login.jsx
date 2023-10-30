@@ -14,7 +14,12 @@ const Login = () => {
     const username = e.target.username.value;
     const password = e.target.password.value;
     try {
-      await loginAction(username, password);
+      const data = await loginAction(username, password);
+
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
+
       toast({
         description: "Login success",
       });

@@ -24,6 +24,11 @@ const Share = ({ doc }) => {
   const changeAccessType = async (e) => {
     try {
       const data = await changeAccess(doc._id, e);
+
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
+
       toast({
         description: data,
       });

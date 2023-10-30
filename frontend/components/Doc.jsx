@@ -20,8 +20,11 @@ const Doc = ({ doc, username }) => {
 
   const renameDocument = async () => {
     try {
-      console.log(doc._id)
       const data = await renameDoc(doc._id, title);
+
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
 
       toast({
         description: data,
@@ -39,6 +42,11 @@ const Doc = ({ doc, username }) => {
   const deleteDocument = async () => {
     try {
       const data = await deleteDoc(doc._id);
+
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
+
       toast({
         description: data,
       });

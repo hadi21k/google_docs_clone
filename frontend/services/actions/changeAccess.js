@@ -15,10 +15,8 @@ export const changeAccess = async (id, access) => {
       }),
     }
   );
+
   const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.error.message);
-  }
 
   return data;
 };

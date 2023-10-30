@@ -16,13 +16,12 @@ export const loginAction = async (username, password) => {
   );
 
   const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.error.message);
-  }
 
   cookies().set("token", data.token, {
     httpOnly: true,
     maxAge: 60 * 60 * 24,
     path: "/",
   });
+
+  return data;
 };

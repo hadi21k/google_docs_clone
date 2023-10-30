@@ -16,9 +16,6 @@ export const renameDoc = async (id, title) => {
     }
   );
   const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.error.message);
-  }
 
   return data;
 };

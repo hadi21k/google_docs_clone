@@ -16,7 +16,11 @@ const Register = () => {
     const password = e.target.password.value;
 
     try {
-      await registerAction(email, username, password);
+      const data = await registerAction(email, username, password);
+
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
 
       toast({
         description: "register success",

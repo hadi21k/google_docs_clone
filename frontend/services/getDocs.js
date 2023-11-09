@@ -9,7 +9,6 @@ const getDocs = async () => {
         headers: {
           Authorization: `Bearer ${cookies().getAll()[0].value}`,
         },
-        cache: "no-cache",
       }
     );
     const data = await response.json();

@@ -9,8 +9,10 @@ export default async function Home() {
   const docsData = getDocs();
 
   const user = await userData;
-  const docs = await docsData;
+
   if (!user) redirect("/login");
+
+  const docs = await docsData;
   return (
     <div className="bg-primary min-h-screen text-white">
       <Navbar user={user} /> 

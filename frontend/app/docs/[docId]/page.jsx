@@ -9,9 +9,11 @@ const page = async ({ params }) => {
   const docData = getDoc(params.docId);
 
   const user = await userData;
-  const doc = await docData;
 
   if (!user) redirect("/login");
+
+  const doc = await docData;
+
   if (!doc) redirect("/");
 
   if (

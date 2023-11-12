@@ -16,7 +16,7 @@ import Header from "@/components/Header";
 
 const QuillNoSSRWrapper = dynamic(() => import("react-quill"), {
   ssr: false,
-  loading: () => <p>Loading ...</p>,
+  LoadingSkeleton: () => <p>LoadingSkeleton ...</p>,
 });
 
 const Editor = ({ doc, user }) => {
